@@ -1,1 +1,1 @@
-Monetize the unloacking of files you've written!
+Monetize the unlocking of files you've written!
