@@ -1,0 +1,119 @@
+<?php require_once 'db_connect.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeShare - Advanced Pastebin Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-code"></i> CodeShare
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="tags.php">Tags</a></li>
+            
+                <li><a href="#" id="darkModeToggle"><i class="fas fa-moon"></i></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="paste-form">
+            <h2>Create New Paste</h2>
+            <form id="pasteForm">
+                <div class="form-group">
+                    <label for="pasteTitle">Paste Title (optional):</label>
+                    <input type="text" id="pasteTitle" name="title" placeholder="Paste Title (optional)" />
+                </div>
+                <div class="form-group">
+                    <label for="pasteContent">Content:</label>
+                    <textarea id="pasteContent" name="content" rows="15" placeholder="Enter your code or text here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="pasteSyntax">Syntax Highlighting:</label>
+                    <select id="pasteSyntax" name="syntax">
+                        <option value="plaintext">Plain Text</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="php">PHP</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pasteExpiration">Expiration:</label>
+                    <select id="pasteExpiration" name="expiration">
+                        <option value="10m">10 Minutes</option>
+                        <option value="1h">1 Hour</option>
+                        <option value="1d">1 Day</option>
+                        <option value="1w">1 Week</option>
+                        <option value="1m">1 Month</option>
+                        <option value="never">Never</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pasteTags">Tags (comma-separated):</label>
+                    <input type="text" id="pasteTags" name="tags" placeholder="e.g., javascript, tutorial, algorithm" />
+                </div>
+                <div class="form-group">
+                    <label for="isLocked">Lock paste (Group Payment):</label>
+                    <input type="checkbox" id="isLocked" name="is_locked">
+                </div>
+                <div class="form-group" id="paymentGoalGroup">
+                    <label for="paymentGoal">Payment goal ($):</label>
+                    <input type="number" id="paymentGoal" name="payment_goal" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="paypal_email">PayPal Email:</label>
+                    <input type="email" id="paypal_email" name="paypal_email">
+                </div>
+                <button type="submit">Create Paste</button>
+            </form>
+        </section>
+        <section id="paste-result" style="display: none;">
+            <h2>Your Paste</h2>
+            <p>Paste URL: <a id="pasteUrl" href="#" target="_blank"></a></p>
+            <pre><code id="pasteContentDisplay"></code></pre>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 CodeShare - Advanced Pastebin Clone</p>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+        document.getElementById('pasteForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('create_paste.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    const pasteUrl = `view_paste.php?id=${data.id}`;
+                    document.getElementById('paste-result').style.display = 'block';
+                    document.getElementById('pasteUrl').href = pasteUrl;
+                    document.getElementById('pasteUrl').textContent = pasteUrl;
+                    document.getElementById('pasteContentDisplay').textContent = document.getElementById('pasteContent').value;
+                } else {
+                    alert('Error creating paste: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while creating the paste.');
+            });
+        });
+    </script>
+</body>
+</html>
